@@ -1,0 +1,46 @@
+<script>
+    let pageName = "Admin Giriş Sayfası";
+  </script>
+<%-include('topView')%>
+
+
+
+
+
+<% 
+  if(userSession === 'true'){
+%>
+ Daha önce giriş yaptınız.
+<%}else{%>
+<form class="form-signin" action="/adminLogin" method="POST" >
+    <div class="text-center mb-4">
+      <p><br>----> <code>|Mazhar SELVİTOPİ|Enes ELMA|Muhammed DURMUŞ|Hikmet ÇAVUŞ|Berkay Ahmed EMİR|</code><---- </p>
+    </div>
+
+    <div class="form-label-group">
+      
+      <input type="text" id="inputEmail" class="form-control" name="username" placeholder="Kullanıcı Adı" required autofocus>
+      <label for="inputEmail">Kullanıcı Adı:</label>
+    </div>
+
+    <div class="form-label-group">
+      
+      <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Şifre" required>
+      <label for="inputPassword">Şifre:</label>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Giriş Yap</button>
+    
+  </form>
+<%
+}
+%>
+<%
+if(info){
+%>
+
+<b><%=info%></b>
+
+<%}%>
+
+
+<%-include('bottomView')%>

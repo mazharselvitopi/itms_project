@@ -1,0 +1,164 @@
+<script>
+    let pageName = "Sayfalar";
+  </script>
+<%-include('topView')%>
+
+<main role="main" class="container">
+    <form name="addPage" method="POST" action="/addPage">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="category" id="category1"  onclick="getPageOrder(this)" value="Itil-V3" required>
+        <label class="form-check-label" for="category1">
+          Itil-V3
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="category" id="category2"  onclick="getPageOrder(this)" value="Cobit">
+        <label class="form-check-label" for="category2">
+          Cobit
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="category" id="category3"  onclick="getPageOrder(this)" value="Iso-27001">
+        <label class="form-check-label" for="category3">
+          Iso-27001
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="category" id="category4" onclick="getPageOrder(this)" value="Iso-9001">
+        <label class="form-check-label" for="category4">
+          Iso-9001
+        </label>
+      </div>
+  
+      <div class="form-group">
+        <label for="pageTitle1">Sayfa Başlığı</label>
+        <textarea class="form-control" id="pageTitle1" name="pageTitle" rows="3" required></textarea>
+      </div>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="autoSizingCheck" onchange="chooseOrder(this)" checked>
+        <label class="form-check-label" for="autoSizingCheck" >
+          Sırayı Otomatik Seç
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="pageOrder">Sayfa Sırası</label>
+        <input type="number" class="form-control" id="pageOrder" placeholder="1" name="pageOrder" disabled required>
+      </div>
+
+      <div class="form-group">
+        <label for="pageContent">İçerik</label>
+        <textarea class="form-control" id="pageContent" rows="3" name="pageContent"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Sayfayı Ekle</button>
+    </form>
+    <div class="p-3 mb-3 bg-light rounded">
+    <h4 class="font-italic">Bilgi Alanı</h4>
+    <p class="mb-0" id="infoArea"> <em></em> </p>
+    </div>
+<!---------------------------------------------------------------------------------------------->
+<form name="getPages" method="POST" action="/getPages">
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="category" id="categoryg1"  onclick="getPageOrder(this)" value="Itil-V3" required>
+      <label class="form-check-label" for="categoryg1">
+        Itil-V3
+      </label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="category" id="categoryg2"  onclick="getPageOrder(this)" value="Cobit">
+      <label class="form-check-label" for="categoryg2">
+        Cobit
+      </label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="category" id="categoryg3"  onclick="getPageOrder(this)" value="Iso-27001">
+      <label class="form-check-label" for="categoryg3">
+        Iso-27001
+      </label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="category" id="categoryg4" onclick="getPageOrder(this)" value="Iso-9001">
+      <label class="form-check-label" for="categoryg4">
+        Iso-9001
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">Seçtiğim Kategorideki Tüm Sayfaları Getir</button>
+</form>
+
+  </main>
+  
+  <script>
+
+      function chooseOrder(checkboxElement){//burasi checkbox icin
+          if(checkboxElement.checked){
+            document.getElementById('pageOrder').disabled = true;
+            getPageOrder(addPage.category.value);
+          }else{
+
+            document.getElementById('pageOrder').disabled = false;
+
+          }
+      }
+
+      function getPageOrder(category) {//kayit icin
+            //event.preventDefault();
+        
+            var category = addPage.category.value;
+            var pageOrder = 0;
+
+            var data = "category=" + category;
+
+            ysAjax("/getPageOrder", "POST", data, function (result) {
+            if(result.responseText != "null"){
+                var incomingData = JSON.parse(result.responseText);
+                var newOrder = incomingData.pageOrder;
+                newOrder++;
+                newOrder++;
+                document.getElementById('pageOrder').value = newOrder;
+            }else{
+                document.getElementById('pageOrder').value = 1;
+            }
+            
+            document.getElementById('infoArea').innerHTML = result.responseText;
+            });
+        
+        }
+
+        var addPage = document.forms["addPage"];
+        addPage.addEventListener("submit", sendDataForRecord);
+
+        function sendDataForRecord(event) {//kayit icin
+            event.preventDefault();
+
+            var pageTitle = addPage.pageTitle.value;
+            var category = addPage.category.value;
+            var pageOrder = addPage.pageOrder.value;
+            var unprocessedPageContent = addPage.pageContent.value;
+            var pageContent = processContent(unprocessedPageContent);
+
+            var data = "pageTitle=" + pageTitle + "&category=" + category+ "&pageOrder=" + pageOrder+ "&unprocessedPageContent=" + unprocessedPageContent+ "&pageContent=" + pageContent;
+
+            ysAjax("/addPage", "POST", data, function (result) {
+            //alert(sonuc.response);
+            //alert(sonuc.responseText);
+            //var gelenVeri = JSON.parse(sonuc.responseText);
+
+            //document.getElementById('bilgiAlani').innerHTML = gelenVeri.getData +' ' +gelenVeri.pageTitle +' ' + gelenVeri.category + '<br><em>kaydedildi.</em>';
+            document.getElementById('infoArea').innerHTML = result.responseText;
+            getPageOrder(addPage.category.value);
+            });
+        }
+
+    </script>
+    <!--
+      <script>
+  'use strict';
+    ysAjax('metin.txt', 'GET', null, yazdir);
+  
+    function yazdir (sonuc) {
+      console.log(sonuc.responseText);
+    }
+  </script>
+  
+    -->
+<%-include('bottomView')%>
